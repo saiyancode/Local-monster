@@ -43,12 +43,14 @@ class Density():
 
     @classmethod
     def get_density(self,keyword,body):
+        data = {}
         print(keyword)
         ngram = []
         clean = keyword.split(' ')
         lengthKeyword = len(clean)
         print(lengthKeyword)
         print(len(body))
+        data['content_length'] = len(body)
         counter = 0
         for i in range(len(body)):
             ngram.append(body[counter:counter + lengthKeyword])
@@ -65,33 +67,31 @@ class Density():
                 continue
         try:
             Density = count / len(body)
+            data['density'] = Density
         except:
             Density = None
-        return Density
+            data['density'] = Density
+        data['keyword_mentions'] = count
+        return data
 
 
-class meta_data():
+class META():
     data = {}
 
-    def __init__(self, url, body, Project, cursor, db):
+    def __init__(self, url, body):
+        print(url)
         soup = BeautifulSoup(body)
         self.url = url
-        self.project = Project
+        now = time.strftime('%Y-%m-%d %H:%M')
         try:
             gen = soup.find('meta', attrs={'name': 'generator'})
             type1 = 'none'
             if gen['content'] is not None:
                 type1 = gen['content']
             self.now = time.strftime('%Y-%m-%d %H:%M')
-            # cursor.execute('''INSERT INTO results(id,url,type,time)
-            #                   VALUES(?,?,?,?)''', (Project, url, type1, self.now))
-            # db.commit()
         except:
             type1 = 'None'
             self.now = time.strftime('%Y-%m-%d %H:%M')
-            # cursor.execute('''INSERT INTO results(id,url,type,time)
-            #                           VALUES(?,?,?,?)''', (Project, url, type1, self.now))
-            # db.commit()
         try:
             meta_title = soup.title.text
             title_length = len(meta_title)
@@ -106,10 +106,6 @@ class meta_data():
             meta_description = 'N/A'
             meta_description_length = 'N/A'
         try:
-            response_header = response_header
-        except:
-            response_header = 'N/A'
-        try:
             canonical = soup.find('link', attrs={'rel': 'canonical'})
             canonical_count = len(soup.findAll('link', attrs={'rel': 'canonical'}))
             canonical = canonical['href']
@@ -122,13 +118,29 @@ class meta_data():
             robots = robots['content']
         except:
             robots = 'N/A'
+        try:
+            H1 = soup.find('h1').text
+        except:
+            H1 = 'None'
 
-        cursor.execute('''INSERT INTO results(id,url,meta_title,title_length,meta_description,description_length,
-        response_header,canonical,canonical_count,robots,type,time)
-                                              VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (Project, url, meta_title,
-                                                                                   title_length, meta_description,
-                                                                                   meta_description_length,
-                                                                                   response_header, canonical,
-                                                                                   canonical_count, robots, type1,
-                                                                                   self.now))
-        db.commit()
+
+        self.store(now,type1,url,meta_title,title_length,meta_description,meta_description_length,canonical,canonical_count,robots,H1)
+
+    @classmethod
+    def store(self,now,type1,url,meta_title,title_length,meta_description,meta_description_length,canonical,canonical_count,robots,H1):
+        data = dict.fromkeys(
+            ['Date', 'Project','Content-type','MetaTitle','MetaTitleLength','MetaDescription','MetaDescriptionLength','URL','H1',
+             'Canonical','Canonical_count','Robots','H1'])
+        data['Date'] = now
+        data['Content-type'] = type1
+        data['URL'] = url
+        data['MetaTitle'] = meta_title
+        data['MetaTitleLength'] = title_length
+        data['MetaDescription'] = meta_description
+        data['MetaDescriptionLength'] = meta_description_length
+        data['Canonical'] = canonical
+        data['Canonical_Count'] = canonical_count
+        data['Robots'] = robots
+        data['H1'] = H1
+        print(data)
+        return(data)

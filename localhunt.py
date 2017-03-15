@@ -84,7 +84,6 @@ class local_results():
         local_results.data['address'].append(address)
         local_results.data['keyword'].append(keyword)
         local_results.data['geo'].append(geo)
-        print(header)
 
     @classmethod
     def save(self):
