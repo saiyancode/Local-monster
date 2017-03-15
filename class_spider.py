@@ -34,8 +34,9 @@ class spider():
             print('Now crawling ' + queue_url + " | there are " + str(len(self.queue)) + " links in queue")
             try:
                 body = await self.get_body(queue_url)
-                #meta = meta_data()
+                meta = META(queue_url,body)
                 density = Density(keyword,body)
+                print(type(meta))
             except Exception as e:
                 print(e)
                 pass
