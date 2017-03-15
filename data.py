@@ -11,9 +11,12 @@ class Density():
 
     def __init__(self,keyword,body):
         body = body.decode('utf-8')
-        self.body = self.clean_page(body)
-        result = self.get_density(keyword[0],self.body)
-        print(result)
+        body = self.clean_page(body)
+        result = self.get_density(keyword[0],body)
+        self.content_length = result['content_length']
+        self.density = result['density']
+        self.keyword_occurence = result['keyword_mentions']
+
 
     @classmethod
     def clean_page(self,body):
@@ -48,8 +51,6 @@ class Density():
         ngram = []
         clean = keyword.split(' ')
         lengthKeyword = len(clean)
-        print(lengthKeyword)
-        print(len(body))
         data['content_length'] = len(body)
         counter = 0
         for i in range(len(body)):
@@ -82,65 +83,41 @@ class META():
         print(url)
         soup = BeautifulSoup(body)
         self.url = url
-        now = time.strftime('%Y-%m-%d %H:%M')
+        self.now = time.strftime('%Y-%m-%d %H:%M')
         try:
             gen = soup.find('meta', attrs={'name': 'generator'})
-            type1 = 'none'
+            self.type1 = 'none'
             if gen['content'] is not None:
-                type1 = gen['content']
+                self.type1 = gen['content']
             self.now = time.strftime('%Y-%m-%d %H:%M')
         except:
-            type1 = 'None'
-            self.now = time.strftime('%Y-%m-%d %H:%M')
+            self.type1 = 'None'
         try:
-            meta_title = soup.title.text
-            title_length = len(meta_title)
+            self.meta_title = soup.title.text
+            self.title_length = len(self.meta_title)
         except:
-            meta_title = 'N/A'
-            title_length = 'N/A'
+            self.meta_title = 'N/A'
+            self.title_length = 'N/A'
         try:
             meta_description = soup.find('meta', attrs={'name': 'description'})
-            meta_description = meta_description['content']
-            meta_description_length = len(meta_description)
+            self.meta_description = meta_description['content']
+            self.meta_description_length = len(meta_description)
         except:
-            meta_description = 'N/A'
-            meta_description_length = 'N/A'
+            self.meta_description = 'N/A'
+            self.meta_description_length = 'N/A'
         try:
             canonical = soup.find('link', attrs={'rel': 'canonical'})
-            canonical_count = len(soup.findAll('link', attrs={'rel': 'canonical'}))
-            canonical = canonical['href']
-            canonical_count = canonical_count
+            self.canonical_count = len(soup.findAll('link', attrs={'rel': 'canonical'}))
+            self.canonical = canonical['href']
         except:
-            canonical = 'N/A'
-            canonical_count = 0
+            self.canonical = 'N/A'
+            self.canonical_count = 0
         try:
             robots = soup.find('meta', attrs={'name': 'robots'})
-            robots = robots['content']
+            self.robots = robots['content']
         except:
-            robots = 'N/A'
+            self.robots = 'N/A'
         try:
-            H1 = soup.find('h1').text
+            self.H1 = soup.find('h1').text
         except:
-            H1 = 'None'
-
-
-        self.store(now,type1,url,meta_title,title_length,meta_description,meta_description_length,canonical,canonical_count,robots,H1)
-
-    @classmethod
-    def store(self,now,type1,url,meta_title,title_length,meta_description,meta_description_length,canonical,canonical_count,robots,H1):
-        data = dict.fromkeys(
-            ['Date', 'Project','Content-type','MetaTitle','MetaTitleLength','MetaDescription','MetaDescriptionLength','URL','H1',
-             'Canonical','Canonical_count','Robots','H1'])
-        data['Date'] = now
-        data['Content-type'] = type1
-        data['URL'] = url
-        data['MetaTitle'] = meta_title
-        data['MetaTitleLength'] = title_length
-        data['MetaDescription'] = meta_description
-        data['MetaDescriptionLength'] = meta_description_length
-        data['Canonical'] = canonical
-        data['Canonical_Count'] = canonical_count
-        data['Robots'] = robots
-        data['H1'] = H1
-        print(data)
-        return(data)
+            self.H1 = 'None'

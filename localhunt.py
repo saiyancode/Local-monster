@@ -49,7 +49,7 @@ class local_results():
                     url_type = 'Organic'
             except:
                 url = 'No website'
-                url_type = 'N/A'
+                url_type = 'Organic'
             try:
                 score = dinner.find('span', attrs={'class': '_PXi'}).text
             except:
@@ -133,13 +133,13 @@ def ranks(i):
         print(e)
     driver.quit()
 
-def main():
+def main(keywords):
     futures = []
     with ThreadPoolExecutor(max_workers=threads) as ex:
         for keyword in keywords:
             futures.append(ex.submit(ranks,keyword))
 
 
-main()
+main(keywords)
 
 

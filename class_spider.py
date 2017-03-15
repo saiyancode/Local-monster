@@ -36,7 +36,10 @@ class spider():
                 body = await self.get_body(queue_url)
                 meta = META(queue_url,body)
                 density = Density(keyword,body)
-                print(type(meta))
+                result = (meta.__dict__)
+                result1 = (density.__dict__)
+                combined = {**result, **result1}
+                print(combined)
             except Exception as e:
                 print(e)
                 pass
